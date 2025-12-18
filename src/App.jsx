@@ -12,16 +12,18 @@ import { fetchTodos, createTodo, updateTodo, deleteTodo } from './api/todoApi.js
 
 const API_BASE_URL = 'https://x8ki-letl-twmt.n7.xano.io/api:3GfcDNxW'
 
-/* ----------  API wrappers  ---------- */
+/* ----------  API wrappers (return data for .then)  ---------- */
 async function _fetchTodos(setTodos, setLoading, _showToast) {
   setLoading(true)
   try {
     const data = await fetchTodos()
     setTodos(data)
+    return data // ← hand fresh list to .then
   } catch (_err) {
     console.log(_err)
     _showToast('Error loading tasks', 'error')
     setTodos([])
+    return [] // ← still hand empty list
   } finally {
     setLoading(false)
   }
@@ -147,7 +149,7 @@ function showToast(msg, type = 'success', setToast) {
   }
 }
 
-/* ----------  OVERDUE ALERTS  ---------- */
+/* ----------  OVERDUE ALERTS (run AFTER data)  ---------- */
 function _checkOverdueTasks(todos, _showToast) {
   todos.forEach(todo => {
     if (todo.is_completed) return
@@ -181,18 +183,18 @@ export default function App() {
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
 
-  // LIFECYCLE (mount only)
+  /* ----------  LIFECYCLE (mount only)  ---------- */
   useEffect(() => {
-  setLoading(true)
-  _fetchTodos(setTodos, setLoading, (m, t) => showToast(m, t, setToast))
-    .then(() => {
-      checkTheme(setTheme)
-      _checkOverdueOnLoad(todos)    // browser alert if already late
-      const id = setInterval(() => _checkOverdueTasks(todos, (m, t) => showToast(m, t, setToast)), 60000)
-      return () => clearInterval(id)
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [])
+    setLoading(true)
+    _fetchTodos(setTodos, setLoading, (m, t) => showToast(m, t, setToast))
+      .then((freshTodos) => {          // ← use returned data
+        checkTheme(setTheme)
+        _checkOverdueOnLoad(freshTodos)   // browser alert if already late
+        const id = setInterval(() => _checkOverdueTasks(freshTodos, (m, t) => showToast(m, t, setToast)), 60000)
+        return () => clearInterval(id)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   /* ----------  RENDER  ---------- */
   return (
