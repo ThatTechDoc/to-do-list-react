@@ -198,7 +198,7 @@ export default function App() {
         <div className="header-controls">
           <TodoFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} filter={filter} setFilter={setFilter} />
           <button className="theme-toggle" onClick={() => toggleTheme(theme, setTheme)}>
-            <img src={theme === 'dark' ? '/icons/theme-light-dark.svg' : '/icons/theme-dark.svg'} alt="Toggle theme" />
+            <img src={theme === 'dark' ? './component/icons/LightMode.jsx' : './component/icons/DarkMode.jsx'} alt="Toggle theme" />
           </button>
         </div>
       </header>
