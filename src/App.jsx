@@ -6,6 +6,8 @@ import EditModal from './components/EditModal.jsx'
 import DeleteModal from './components/DeleteModal.jsx'
 import Toast from './components/Toast.jsx'
 import Loading from './components/Loading.jsx'
+import { ReactComponent as MoonIcon } from './components/icons/DarkMode.jsx'
+import { ReactComponent as SunIcon } from './components/icons/LightMode.jsx'
 import { fetchTodos, createTodo, updateTodo, deleteTodo } from './api/todoApi.js'
 
 const API_BASE_URL = 'https://x8ki-letl-twmt.n7.xano.io/api:3GfcDNxW'
@@ -179,14 +181,16 @@ export default function App() {
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
 
-  /* ----------  LIFECYCLE (mount only)  ---------- */
+  // LIFECYCLE (mount only)
   useEffect(() => {
   setLoading(true)
   _fetchTodos(setTodos, setLoading, (m, t) => showToast(m, t, setToast))
-  checkTheme(setTheme)
-  _checkOverdueOnLoad(todos)
-  const id = setInterval(() => _checkOverdueTasks(todos, (m, t) => showToast(m, t, setToast)), 60000)
-  return () => clearInterval(id)
+    .then(() => {
+      checkTheme(setTheme)
+      _checkOverdueOnLoad(todos)    // browser alert if already late
+      const id = setInterval(() => _checkOverdueTasks(todos, (m, t) => showToast(m, t, setToast)), 60000)
+      return () => clearInterval(id)
+    })
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [])
 
@@ -198,7 +202,7 @@ export default function App() {
         <div className="header-controls">
           <TodoFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} filter={filter} setFilter={setFilter} />
           <button className="theme-toggle" onClick={() => toggleTheme(theme, setTheme)}>
-            <img src={theme === 'dark' ? './component/icons/LightMode.jsx' : './component/icons/DarkMode.jsx'} alt="Toggle theme" />
+            {theme === 'dark' ? <MoonIcon width={24} height={24} /> : <SunIcon width={24} height={24} />}
           </button>
         </div>
       </header>

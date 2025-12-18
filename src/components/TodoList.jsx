@@ -34,7 +34,7 @@ export default function TodoList({
   // 3.  sort by due date (same as vanilla)
   filtered.sort((a, b) => new Date(`${a.due_date}T${a.due_time}:00`) - new Date(`${b.due_date}T${b.due_time}:00`))
 
-  // 3b.  completed tasks to bottom (same vanilla behaviour)
+  // 3b.  completed tasks to bottom
   filtered.sort((a, b) => a.is_completed - b.is_completed)
 
   // 4.  add isOverdue flag (pure)
